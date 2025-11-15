@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -189,8 +188,6 @@ model GovernmentPlan {
   documentUrl      String?
   fromYear         Int?
   toYear           Int?
-
-  items            GovernmentPlanItem[]
 }
 
 // =====================

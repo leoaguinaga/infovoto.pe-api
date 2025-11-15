@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsDateString, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { ElectionType } from 'generated/prisma/client';
+import { ElectionType } from '@prisma/client';
 
 export class CreateElectionDto {
   @ApiProperty({

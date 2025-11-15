@@ -2,7 +2,7 @@ import { PartialType } from '@nestjs/mapped-types';
 import { CreateGuideContentDto } from './create-guide-content.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
-import { GuideCategory } from 'generated/prisma/client';
+import { GuideCategory } from '@prisma/client';
 
 export class UpdateGuideContentDto extends PartialType(
   CreateGuideContentDto,

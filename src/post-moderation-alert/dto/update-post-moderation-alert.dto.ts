@@ -10,7 +10,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { ModerationStatus } from 'generated/prisma/client';
+import { ModerationStatus } from '@prisma/client';
 
 export class UpdatePostModerationAlertDto extends PartialType(
   CreatePostModerationAlertDto,

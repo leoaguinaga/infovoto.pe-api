@@ -9,7 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTableMemberDto } from './dto/create-table-member.dto';
 import { UpdateTableMemberDto } from './dto/update-table-member.dto';
 import { ServiceResponse } from 'src/interfaces/serviceResponse';
-import { UserRole } from 'generated/prisma/client';
+import { UserRole } from '@prisma/client';
 
 @Injectable()
 export class TableMemberService {

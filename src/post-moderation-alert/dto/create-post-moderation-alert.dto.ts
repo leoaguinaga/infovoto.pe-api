@@ -9,7 +9,7 @@ import {
   ApiProperty,
   ApiPropertyOptional,
 } from '@nestjs/swagger';
-import { ModerationStatus } from 'generated/prisma/client';
+import { ModerationStatus } from '@prisma/client';
 
 export class CreatePostModerationAlertDto {
   @ApiProperty({

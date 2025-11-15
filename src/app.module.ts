@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PrismaService } from './prisma.service';
+import { PrismaService } from './prisma/prisma.service';
 import { UserModule } from './user/user.module';
 import { VoterModule } from './voter/voter.module';
 import { TableMemberModule } from './table-member/table-member.module';
@@ -18,9 +18,10 @@ import { VotingCenterModule } from './voting-center/voting-center.module';
 import { VotingTableModule } from './voting-table/voting-table.module';
 import { GuideContentModule } from './guide-content/guide-content.module';
 import { NewsItemModule } from './news-item/news-item.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
-  imports: [UserModule, VoterModule, TableMemberModule, ElectionModule, ElectoralEventModule, PoliticalGroupModule, CandidateModule, GovernmentPlanModule, PostModule, CommentModule, VoteIntentionModule, PostModerationAlertModule, VotingCenterModule, VotingTableModule, GuideContentModule, NewsItemModule],
+  imports: [PrismaModule, UserModule, VoterModule, TableMemberModule, ElectionModule, ElectoralEventModule, PoliticalGroupModule, CandidateModule, GovernmentPlanModule, PostModule, CommentModule, VoteIntentionModule, PostModerationAlertModule, VotingCenterModule, VotingTableModule, GuideContentModule, NewsItemModule],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })

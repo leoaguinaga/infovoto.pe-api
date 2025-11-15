@@ -2,7 +2,7 @@ import { PartialType } from '@nestjs/mapped-types';
 import { CreateElectionDto } from './create-election.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
-import { ElectionType } from 'generated/prisma/client';
+import { ElectionType } from '@prisma/client';
 
 export class UpdateElectionDto extends PartialType(CreateElectionDto) {
   @ApiPropertyOptional({

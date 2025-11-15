@@ -6,7 +6,7 @@ import {
   IsString,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { PostStatus } from 'generated/prisma/client';
+import { PostStatus } from '@prisma/client';
 
 export class CreatePostDto {
   @ApiProperty({

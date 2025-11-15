@@ -7,7 +7,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePostModerationAlertDto } from './dto/create-post-moderation-alert.dto';
 import { UpdatePostModerationAlertDto } from './dto/update-post-moderation-alert.dto';
 import { ServiceResponse } from 'src/interfaces/serviceResponse';
-import { ModerationStatus } from 'generated/prisma/client';
+import { ModerationStatus } from '@prisma/client';
 
 @Injectable()
 export class PostModerationAlertService {

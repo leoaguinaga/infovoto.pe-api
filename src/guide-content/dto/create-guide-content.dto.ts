@@ -6,7 +6,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { GuideCategory } from 'generated/prisma/client';
+import { GuideCategory } from '@prisma/client';
 
 export class CreateGuideContentDto {
   @ApiProperty({
