@@ -1,8 +1,9 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
   MinLength,
 } from 'class-validator';
@@ -17,28 +18,31 @@ export class CreateUserDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({
-    description: 'Correo electrónico del usuario (único)',
+  @ApiPropertyOptional({
+    description: 'Correo electrónico del usuario (único). Opcional para pre-registro de votantes.',
     example: 'anderson@example.com',
   })
   @IsEmail()
-  @IsNotEmpty()
-  email: string;
+  @IsOptional()
+  email?: string;
 
-  @ApiProperty({
-    description: 'Contraseña en texto plano (se almacenará hasheada)',
+  @ApiPropertyOptional({
+    description: 'Contraseña en texto plano (se almacenará hasheada). Opcional para pre-registro de votantes.',
     example: 'MiContraseñaSegura123',
     minLength: 6,
   })
   @IsString()
   @MinLength(6)
-  password: string;
+  @IsOptional()
+  password?: string;
 
-  @ApiProperty({
-    description: 'Rol del usuario dentro del sistema',
+  @ApiPropertyOptional({
+    description: 'Rol del usuario dentro del sistema. Por defecto: VOTER',
     enum: UserRole,
     example: UserRole.VOTER,
+    default: UserRole.VOTER,
   })
   @IsEnum(UserRole)
-  role: UserRole;
+  @IsOptional()
+  role?: UserRole;
 }

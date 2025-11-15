@@ -7,6 +7,7 @@ El sistema de subida de archivos permite almacenar imágenes para:
 - **Candidatos**: Foto del candidato
 - **Posts**: Hasta 5 imágenes por post
 - **Comentarios**: Hasta 3 imágenes por comentario
+- **Contenido de Guías**: Hasta 5 imágenes por guía
 
 ## Configuración
 
@@ -174,6 +175,49 @@ curl -X POST http://localhost:3000/comments/1/upload-images \
 
 ---
 
+### 5. Subir Imágenes de Contenido de Guía
+
+**Endpoint**: `POST /guide-contents/:id/upload-images`
+
+**Descripción**: Sube hasta 5 imágenes para un contenido de guía específico.
+
+**Parámetros**:
+- `id` (path): ID del contenido de guía
+
+**Body**: `multipart/form-data`
+- `files`: Array de archivos de imagen (máximo 5)
+
+**Ejemplo con cURL**:
+```bash
+curl -X POST http://localhost:3000/guide-contents/1/upload-images \
+  -H "Content-Type: multipart/form-data" \
+  -F "files=@/ruta/imagen1.jpg" \
+  -F "files=@/ruta/imagen2.jpg"
+```
+
+**Respuesta exitosa**:
+```json
+{
+  "success": true,
+  "message": "Imágenes subidas correctamente",
+  "data": {
+    "count": 2,
+    "files": [
+      {
+        "filename": "image-1699999999999-123456789.jpg",
+        "url": "/uploads/guide-contents/image-1699999999999-123456789.jpg"
+      },
+      {
+        "filename": "image-1699999999999-987654321.jpg",
+        "url": "/uploads/guide-contents/image-1699999999999-987654321.jpg"
+      }
+    ]
+  }
+}
+```
+
+---
+
 ## Manejo de Errores
 
 ### Error: Tipo de archivo no permitido
@@ -199,7 +243,8 @@ uploads/
 ├── political-groups/    # Fotos de partidos políticos
 ├── candidates/          # Fotos de candidatos
 ├── posts/              # Imágenes de posts
-└── comments/           # Imágenes de comentarios
+├── comments/           # Imágenes de comentarios
+└── guide-contents/     # Imágenes de contenidos de guías
 ```
 
 ## Pruebas con Postman
@@ -245,4 +290,5 @@ Busca los endpoints con la etiqueta `@ApiConsumes('multipart/form-data')`.
    - Candidatos: 1 foto
    - Posts: Hasta 5 imágenes
    - Comentarios: Hasta 3 imágenes
+   - Contenidos de Guías: Hasta 5 imágenes
 4. **Persistencia**: Los archivos se almacenan en el sistema de archivos local en la carpeta `./uploads/`.

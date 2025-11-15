@@ -13,9 +13,20 @@ async function bootstrap() {
   });
 
   const config = new DocumentBuilder()
-    .setTitle('GAVA C&C Requirements Request System')
-    .setDescription('API documentation for the GAVA C&C Requirements Request System')
+    .setTitle('InfoVoto Peru API')
+    .setDescription('API documentation for InfoVoto Peru - Electoral Information System')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'JWT-auth', // This name will be used to reference this security scheme
+    )
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);

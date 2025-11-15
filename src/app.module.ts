@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaService } from './prisma/prisma.service';
@@ -20,11 +21,21 @@ import { GuideContentModule } from './guide-content/guide-content.module';
 import { NewsItemModule } from './news-item/news-item.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UploadModule } from './upload/upload.module';
+import { MailModule } from './mail/mail.module';
+import { AuthModule } from './auth/auth.module';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { GovernmentPlanSectionModule } from './government-plan-section/government-plan-section.module';
 
 @Module({
-  imports: [PrismaModule, UploadModule, UserModule, VoterModule, TableMemberModule, ElectionModule, ElectoralEventModule, PoliticalGroupModule, CandidateModule, GovernmentPlanModule, PostModule, CommentModule, VoteIntentionModule, PostModerationAlertModule, VotingCenterModule, VotingTableModule, GuideContentModule, NewsItemModule, GovernmentPlanSectionModule],
+  imports: [PrismaModule, UploadModule, MailModule, AuthModule, UserModule, VoterModule, TableMemberModule, ElectionModule, ElectoralEventModule, PoliticalGroupModule, CandidateModule, GovernmentPlanModule, PostModule, CommentModule, VoteIntentionModule, PostModerationAlertModule, VotingCenterModule, VotingTableModule, GuideContentModule, NewsItemModule],
   controllers: [AppController],
-  providers: [AppService, PrismaService],
+  providers: [
+    AppService,
+    PrismaService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

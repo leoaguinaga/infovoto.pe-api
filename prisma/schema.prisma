@@ -88,14 +88,19 @@ enum GovernmentPlanSector {
 // USUARIOS Y PERFILES
 // =====================
 model User {
-  id           Int       @id @default(autoincrement())
-  name         String
-  email        String    @unique
-  passwordHash String
-  role         UserRole
+  id                    Int       @id @default(autoincrement())
+  name                  String
+  email                 String?   @unique
+  passwordHash          String?
+  role                  UserRole
 
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  // Estado de activación de cuenta
+  isActive              Boolean   @default(false)
+  activationToken       String?   @unique
+  activationTokenExpiry DateTime?
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   // Perfiles
   voterProfile        Voter?

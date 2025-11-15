@@ -1,98 +1,262 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# InfoVoto Peru API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API REST para el sistema de información electoral de Perú, construida con NestJS, Prisma y PostgreSQL.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Características
 
-## Description
+- 🗳️ **Sistema Electoral Completo**: Gestión de elecciones, candidatos, partidos políticos y planes de gobierno
+- 👥 **Gestión de Usuarios**: Pre-registro con DNI, activación por email y autenticación JWT
+- 📧 **Sistema de Correos**: Envío de emails de activación con soporte para múltiples proveedores
+- 📁 **Upload de Archivos**: Sistema de subida de imágenes para partidos, candidatos, posts y comentarios
+- 🔐 **Autenticación JWT**: Protección de endpoints con soporte para rutas públicas
+- 📊 **Documentación Swagger**: API docs interactiva con autenticación incluida
+- 🎯 **TypeScript**: Tipado fuerte en toda la aplicación
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Tecnologías
 
-## Project setup
+- [NestJS](https://nestjs.com/) - Framework backend
+- [Prisma](https://www.prisma.io/) - ORM para PostgreSQL
+- [PostgreSQL](https://www.postgresql.org/) - Base de datos
+- [JWT](https://jwt.io/) - Autenticación
+- [Nodemailer](https://nodemailer.com/) - Envío de emails
+- [Multer](https://github.com/expressjs/multer) - Upload de archivos
+- [Swagger/OpenAPI](https://swagger.io/) - Documentación de API
 
-```bash
-$ pnpm install
-```
+## Requisitos Previos
 
-## Compile and run the project
+- Node.js 18+ y pnpm
+- PostgreSQL 14+
+
+## Instalación
 
 ```bash
-# development
-$ pnpm run start
+# Instalar dependencias
+pnpm install
 
-# watch mode
-$ pnpm run start:dev
+# Copiar archivo de variables de entorno
+cp .env.example .env
 
-# production mode
-$ pnpm run start:prod
+# Configurar .env con tus credenciales de base de datos y JWT_SECRET
+# DATABASE_URL="postgresql://user:password@localhost:5432/infovoto"
+# JWT_SECRET="tu_clave_secreta_super_segura"
+# JWT_EXPIRES_IN="24h"
+
+# Ejecutar migraciones de Prisma
+npx prisma migrate dev
+
+# Generar cliente de Prisma
+npx prisma generate
 ```
 
-## Run tests
+## Configuración
+
+### Variables de Entorno
+
+Edita el archivo `.env` con tu configuración:
+
+```env
+# Base de datos
+DATABASE_URL="postgresql://user:password@localhost:5432/infovoto"
+
+# Servidor
+PORT=3000
+
+# JWT Authentication
+JWT_SECRET="tu_clave_secreta_super_segura"
+JWT_EXPIRES_IN="24h"
+
+# Frontend URL
+FRONTEND_URL="http://localhost:3001"
+
+# Email (opcional, usa Ethereal automáticamente si no se configura)
+MAIL_HOST="smtp.gmail.com"
+MAIL_PORT=587
+MAIL_USER="tu-email@gmail.com"
+MAIL_PASSWORD="tu-app-password"
+```
+
+Para más detalles sobre configuración de email, ver [EMAIL_CONFIG_GUIDE.md](./EMAIL_CONFIG_GUIDE.md).
+
+## Ejecutar la Aplicación
 
 ```bash
-# unit tests
-$ pnpm run test
+# Modo desarrollo
+pnpm run start:dev
 
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+# Modo producción
+pnpm run build
+pnpm run start:prod
 ```
 
-## Deployment
+La API estará disponible en `http://localhost:3000`
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Documentación
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Swagger UI
+
+Accede a la documentación interactiva en: `http://localhost:3000/documentation`
+
+### Guías
+
+- **[JWT_AUTH_GUIDE.md](./JWT_AUTH_GUIDE.md)** - Sistema de autenticación JWT y rutas públicas
+- **[ACCOUNT_ACTIVATION_GUIDE.md](./ACCOUNT_ACTIVATION_GUIDE.md)** - Flujo de registro y activación de cuentas
+- **[EMAIL_CONFIG_GUIDE.md](./EMAIL_CONFIG_GUIDE.md)** - Configuración del sistema de correos
+- **[UPLOAD_GUIDE.md](./UPLOAD_GUIDE.md)** - Sistema de subida de archivos
+
+## Endpoints Principales
+
+### Autenticación (Público)
+- `POST /auth/login` - Iniciar sesión
+- `POST /voters/pre-register` - Pre-registrar votante con DNI
+- `POST /users/register-email` - Registrar email
+- `POST /users/activate-account` - Activar cuenta
+
+### Consulta de Información (Público)
+- `GET /elections` - Listar elecciones
+- `GET /political-groups` - Listar partidos políticos
+- `GET /candidates` - Listar candidatos
+- `GET /government-plans` - Listar planes de gobierno
+
+### Gestión (Requiere Autenticación)
+- `GET /auth/profile` - Perfil del usuario
+- `POST /political-groups` - Crear partido político
+- `POST /candidates` - Crear candidato
+- `POST /posts` - Crear publicación
+- `POST /comments` - Crear comentario
+
+Ver la [documentación Swagger](http://localhost:3000/documentation) para la lista completa de endpoints.
+
+## Flujo de Registro
+
+1. **Pre-registro** con DNI: `POST /voters/pre-register`
+2. **Registro de email**: `POST /users/register-email` (envía email de activación)
+3. **Activación**: `POST /users/activate-account` con el token recibido
+4. **Login**: `POST /auth/login` con email y contraseña
+
+Ver [ACCOUNT_ACTIVATION_GUIDE.md](./ACCOUNT_ACTIVATION_GUIDE.md) para más detalles.
+
+## Autenticación JWT
+
+### Login
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+POST /auth/login
+{
+  "email": "usuario@example.com",
+  "password": "password123"
+}
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Respuesta:
+```json
+{
+  "success": true,
+  "data": {
+    "access_token": "eyJhbGciOiJIUzI1..."
+  }
+}
+```
 
-## Resources
+### Usar Token
 
-Check out a few resources that may come in handy when working with NestJS:
+Incluye el token en el header `Authorization`:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```
+Authorization: Bearer eyJhbGciOiJIUzI1...
+```
 
-## Support
+Ver [JWT_AUTH_GUIDE.md](./JWT_AUTH_GUIDE.md) para más detalles.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Base de Datos
 
-## Stay in touch
+### Migraciones
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+# Crear nueva migración
+npx prisma migrate dev --name nombre_migracion
 
-## License
+# Aplicar migraciones en producción
+npx prisma migrate deploy
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+# Ver estado de migraciones
+npx prisma migrate status
+```
+
+### Prisma Studio
+
+```bash
+# Abrir interfaz visual de la base de datos
+npx prisma studio
+```
+
+## Testing
+
+```bash
+# Unit tests
+pnpm run test
+
+# E2E tests
+pnpm run test:e2e
+
+# Test coverage
+pnpm run test:cov
+```
+
+## Estructura del Proyecto
+
+```
+src/
+├── auth/              # Autenticación JWT
+├── user/              # Gestión de usuarios
+├── voter/             # Gestión de votantes
+├── election/          # Elecciones
+├── political-group/   # Partidos políticos
+├── candidate/         # Candidatos
+├── government-plan/   # Planes de gobierno
+├── post/              # Publicaciones
+├── comment/           # Comentarios
+├── mail/              # Sistema de correos
+├── upload/            # Subida de archivos
+├── prisma/            # Cliente Prisma
+└── interfaces/        # Interfaces compartidas
+
+uploads/               # Archivos subidos
+├── political-groups/
+├── candidates/
+├── posts/
+├── comments/
+└── guide-contents/
+
+prisma/
+├── schema.prisma      # Esquema de base de datos
+└── migrations/        # Migraciones
+```
+
+## Seguridad
+
+- ✅ Autenticación JWT con tokens firmados
+- ✅ Bcrypt para hash de contraseñas
+- ✅ Validación de DTOs con class-validator
+- ✅ Guards globales con bypass para rutas públicas
+- ✅ CORS configurado
+- ⚠️ **IMPORTANTE**: Cambia `JWT_SECRET` en producción por una clave segura
+
+## Contribución
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## Licencia
+
+Este proyecto es de código abierto y está disponible bajo la licencia MIT.
+
+## Soporte
+
+Para reportar bugs o solicitar features, abre un issue en el repositorio.
+
+---
+
+Desarrollado con ❤️ para las elecciones de Perú

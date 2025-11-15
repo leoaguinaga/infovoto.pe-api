@@ -13,6 +13,7 @@ import { CreateElectionDto } from './dto/create-election.dto';
 import { UpdateElectionDto } from './dto/update-election.dto';
 import { ServiceResponse } from 'src/interfaces/serviceResponse';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('Elections')
 @Controller('elections')
@@ -31,6 +32,7 @@ export class ElectionController {
     return this.electionService.create(createElectionDto);
   }
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Listar todas las elecciones' })
   @ApiResponse({
@@ -41,6 +43,7 @@ export class ElectionController {
     return this.electionService.findAll();
   }
 
+  @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Obtener una elección por ID' })
   @ApiResponse({

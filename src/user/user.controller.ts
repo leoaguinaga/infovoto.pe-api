@@ -11,12 +11,15 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { RegisterEmailDto } from './dto/register-email.dto';
+import { ActivateAccountDto } from './dto/activate-account.dto';
 import { ServiceResponse } from 'src/interfaces/serviceResponse';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
 } from '@nestjs/swagger';
+import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('Users')
 @Controller('users')
@@ -92,5 +95,73 @@ export class UserController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ServiceResponse<any>> {
     return this.userService.remove(id);
+  }
+
+  @Public()
+  @HttpPost('register-email')
+  @ApiOperation({ 
+    summary: 'Registrar email para votante pre-registrado',
+    description: 'Permite a un votante registrado en el sistema asociar su correo electrónico y recibir un token de activación'
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Correo registrado y token de activación enviado',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Votante no encontrado con ese número de documento',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'El votante ya tiene email registrado o el email ya está en uso',
+  })
+  registerEmail(
+    @Body() registerEmailDto: RegisterEmailDto,
+  ): Promise<ServiceResponse<any>> {
+    return this.userService.registerEmail(registerEmailDto);
+  }
+
+  @Public()
+  @HttpPost('activate-account')
+  @ApiOperation({ 
+    summary: 'Activar cuenta con token',
+    description: 'Activa la cuenta del usuario usando el token recibido por email y establece la contraseña'
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Cuenta activada correctamente',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Token inválido, expirado o cuenta ya activada',
+  })
+  activateAccount(
+    @Body() activateAccountDto: ActivateAccountDto,
+  ): Promise<ServiceResponse<any>> {
+    return this.userService.activateAccount(activateAccountDto);
+  }
+
+  @Public()
+  @HttpPost('resend-activation/:email')
+  @ApiOperation({ 
+    summary: 'Reenviar token de activación',
+    description: 'Reenvía un nuevo token de activación al correo electrónico especificado'
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Nuevo token de activación enviado',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Usuario no encontrado',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'La cuenta ya está activada',
+  })
+  resendActivationToken(
+    @Param('email') email: string,
+  ): Promise<ServiceResponse<any>> {
+    return this.userService.resendActivationToken(email);
   }
 }

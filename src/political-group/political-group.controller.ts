@@ -23,6 +23,7 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { UploadService } from '../upload/upload.service';
+import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('Political Groups')
 @Controller('political-groups')
@@ -44,6 +45,7 @@ export class PoliticalGroupController {
     return this.politicalGroupService.create(createPoliticalGroupDto);
   }
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Listar todas las agrupaciones políticas' })
   @ApiResponse({
@@ -55,6 +57,7 @@ export class PoliticalGroupController {
     return this.politicalGroupService.findAll();
   }
 
+  @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Obtener una agrupación política por ID' })
   @ApiResponse({

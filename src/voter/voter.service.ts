@@ -6,8 +6,10 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateVoterDto } from './dto/create-voter.dto';
+import { PreRegisterVoterDto } from './dto/pre-register-voter.dto';
 import { UpdateVoterDto } from './dto/update-voter.dto';
 import { ServiceResponse } from 'src/interfaces/serviceResponse';
+import { UserRole } from '@prisma/client';
 
 @Injectable()
 export class VoterService {
@@ -103,6 +105,70 @@ export class VoterService {
     return {
       statusCode: HttpStatus.CREATED,
       message: 'Votante creado correctamente',
+      success: true,
+      data: voter,
+    };
+  }
+
+  /**
+   * Pre-registrar votante con DNI
+   * Crea un usuario inactivo y su perfil de votante
+   */
+  async preRegister(preRegisterVoterDto: PreRegisterVoterDto): Promise<ServiceResponse<any>> {
+    const { name, documentNumber, votingTableId } = preRegisterVoterDto;
+
+    // Validar que el documento no esté repetido
+    const existingVoterByDoc = await this.prisma.voter.findUnique({
+      where: { documentNumber },
+    });
+
+    if (existingVoterByDoc) {
+      throw new ConflictException({
+        statusCode: HttpStatus.CONFLICT,
+        message: 'El documento de identidad ya está registrado',
+        success: false,
+        data: null,
+      });
+    }
+
+    // Validar que la mesa de votación exista (si se envía)
+    if (votingTableId) {
+      const table = await this.prisma.votingTable.findUnique({
+        where: { id: votingTableId },
+      });
+
+      if (!table) {
+        throw new NotFoundException({
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'La mesa de votación especificada no existe',
+          success: false,
+          data: null,
+        });
+      }
+    }
+
+    // Crear usuario inactivo sin email ni contraseña
+    const user = await this.prisma.user.create({
+      data: {
+        name,
+        role: UserRole.VOTER,
+        isActive: false,
+      },
+    });
+
+    // Crear perfil de votante asociado
+    const voter = await this.prisma.voter.create({
+      data: {
+        userId: user.id,
+        documentNumber,
+        votingTableId,
+      },
+      include: this.baseInclude,
+    });
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Votante pre-registrado correctamente. Debe activar su cuenta con email.',
       success: true,
       data: voter,
     };

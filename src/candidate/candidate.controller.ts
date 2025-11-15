@@ -23,6 +23,7 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { UploadService } from '../upload/upload.service';
+import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('Candidates')
 @Controller('candidates')
@@ -48,6 +49,7 @@ export class CandidateController {
     return this.candidateService.create(createCandidateDto);
   }
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Listar todos los candidatos' })
   @ApiResponse({
@@ -58,6 +60,7 @@ export class CandidateController {
     return this.candidateService.findAll();
   }
 
+  @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Obtener un candidato por ID' })
   @ApiResponse({

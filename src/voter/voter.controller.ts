@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { VoterService } from './voter.service';
 import { CreateVoterDto } from './dto/create-voter.dto';
+import { PreRegisterVoterDto } from './dto/pre-register-voter.dto';
 import { UpdateVoterDto } from './dto/update-voter.dto';
 import { ServiceResponse } from 'src/interfaces/serviceResponse';
 import {
@@ -17,11 +18,36 @@ import {
   ApiOperation,
   ApiResponse,
 } from '@nestjs/swagger';
+import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('Voters')
 @Controller('voters')
 export class VoterController {
   constructor(private readonly voterService: VoterService) {}
+
+  @Public()
+  @HttpPost('pre-register')
+  @ApiOperation({ 
+    summary: 'Pre-registrar votante con DNI',
+    description: 'Crea un usuario inactivo y su perfil de votante. El votante debe luego activar su cuenta con email.'
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Votante pre-registrado correctamente',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Mesa de votación no encontrada',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'El documento de identidad ya está registrado',
+  })
+  preRegister(
+    @Body() preRegisterVoterDto: PreRegisterVoterDto,
+  ): Promise<ServiceResponse<any>> {
+    return this.voterService.preRegister(preRegisterVoterDto);
+  }
 
   @HttpPost()
   @ApiOperation({ summary: 'Crear un nuevo votante' })
