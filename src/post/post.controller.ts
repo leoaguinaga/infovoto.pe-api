@@ -7,7 +7,10 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -16,12 +19,18 @@ import {
   ApiTags,
   ApiOperation,
   ApiResponse,
+  ApiConsumes,
+  ApiBody,
 } from '@nestjs/swagger';
+import { UploadService } from '../upload/upload.service';
 
 @ApiTags('Posts')
 @Controller('posts')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(
+    private readonly postService: PostService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   @HttpPost()
   @ApiOperation({ summary: 'Crear un nuevo post de candidato' })
@@ -92,5 +101,64 @@ export class PostController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ServiceResponse<any>> {
     return this.postService.remove(id);
+  }
+
+  @HttpPost(':id/upload-images')
+  @ApiOperation({ summary: 'Subir imágenes del post (hasta 5 imágenes)' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Imágenes subidas correctamente',
+  })
+  @UseInterceptors(FilesInterceptor('files', 5, {
+    storage: require('multer').diskStorage({
+      destination: './uploads/posts',
+      filename: (req, file, callback) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        const ext = require('path').extname(file.originalname);
+        callback(null, `image-${uniqueSuffix}${ext}`);
+      },
+    }),
+    fileFilter: (req, file, callback) => {
+      if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+        return callback(new Error('Solo se permiten archivos de imagen'), false);
+      }
+      callback(null, true);
+    },
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB por archivo
+    },
+  }))
+  uploadImages(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    const uploadedFiles = files.map(file => ({
+      filename: file.filename,
+      url: this.uploadService.getFileUrl('posts', file.filename),
+    }));
+
+    return {
+      success: true,
+      message: 'Imágenes subidas correctamente',
+      data: {
+        count: files.length,
+        files: uploadedFiles,
+      },
+    };
   }
 }
