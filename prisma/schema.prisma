@@ -8,32 +8,324 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  posts     Post[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// =====================
+// ENUMS
+// =====================
+
+enum UserRole {
+  ADMIN
+  VOTER
+  TABLE_MEMBER
 }
+
+enum ElectionType {
+  GENERAL
+  REGIONAL
+  MUNICIPAL
+  REFERENDUM
+}
+
+enum ElectoralEventCategory {
+  ELECTION_DAY          // 1.a: fecha de elección
+  PROCESS_RELEVANT      // 1.b: procesos electorales
+  TABLE_MEMBER_RELEVANT // 1.c: miembros de mesa
+  OTHER
+}
+
+enum CandidateOffice {
+  PRESIDENT
+  FIRST_VP
+  SECOND_VP
+  CONGRESS
+  SENATE_NATIONAL
+  SENATE_REGIONAL
+  ANDINE_PARLIAMENT
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  HIDDEN
+  DELETED
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum GuideCategory {
+  // Información para electores (3)
+  ELECTOR_LOCATION                  // 3.a, 3.b
+  ELECTOR_BALLOT_INSTRUCTIONS       // 3.c
+  ELECTOR_SECURITY_RECOMMENDATIONS  // 3.d
+  ELECTOR_LEGAL_FRAMEWORK           // 3.e
+
+  // Información para miembros de mesa (4)
+  TABLE_MEMBER_CALENDAR             // 4.a
+  TABLE_MEMBER_DUTIES_INSTALLATION  // 4.b.i
+  TABLE_MEMBER_DUTIES_VOTING        // 4.b.ii
+  TABLE_MEMBER_DUTIES_OTHER         // 4.b.iii
+
+  // Otros
+  APP_TUTORIAL                      // tutorial para usar la app
+}
+
+// =====================
+// USUARIOS Y PERFILES
+// =====================
+model User {
+  id           Int       @id @default(autoincrement())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         UserRole
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Perfiles
+  voterProfile        Voter?
+  tableMemberProfile  TableMember?
+  candidateProfile    Candidate?
+
+  // Actividad en la app
+  posts               Post[]
+  comments            Comment[]
+  voteIntentions      VoteIntention[]
+  moderationReviews   PostModerationAlert[] @relation("AdminReviews")
+}
+
+model Voter {
+  id              Int      @id @default(autoincrement())
+  user            User     @relation(fields: [userId], references: [id])
+  userId          Int      @unique
+  documentNumber  String   @unique
+
+  votingTable     VotingTable? @relation(fields: [votingTableId], references: [id])
+  votingTableId   Int?
+}
+
+model TableMember {
+  id             Int          @id @default(autoincrement())
+  user           User         @relation(fields: [userId], references: [id])
+  userId         Int          @unique
+
+  votingTable    VotingTable  @relation(fields: [votingTableId], references: [id])
+  votingTableId  Int
+  roleInTable    String?      // presidente, secretario, tercer miembro, etc.
+}
+
+// =====================
+// ELECCIONES Y CALENDARIO
+// =====================
+model Election {
+  id              Int              @id @default(autoincrement())
+  name            String
+  description     String?
+  type            ElectionType
+  date            DateTime
+
+  events          ElectoralEvent[]
+  voteIntentions  VoteIntention[]
+  news            NewsItem[]
+  guides          GuideContent[]
+}
+
+model ElectoralEvent {
+  id          Int                     @id @default(autoincrement())
+  election    Election                @relation(fields: [electionId], references: [id])
+  electionId  Int
+  name        String
+  description String?
+  date        DateTime
+  category    ElectoralEventCategory
+  isPublished Boolean                 @default(true)
+}
+
+// =====================
+// AGRUPACIONES POLÍTICAS Y CANDIDATOS
+// =====================
+
+model PoliticalGroup {
+  id               Int               @id @default(autoincrement())
+  name             String
+  shortName        String?
+  logoUrl          String?
+  description      String?
+
+  governmentPlans  GovernmentPlan[]
+  candidates       Candidate[]
+  news             NewsItem[]
+}
+
+model Candidate {
+  id               Int               @id @default(autoincrement())
+  fullName         String
+  office           CandidateOffice
+  biography        String?
+  photoUrl         String?
+
+  politicalGroup   PoliticalGroup    @relation(fields: [politicalGroupId], references: [id])
+  politicalGroupId Int
+
+  // Cuenta dentro del sistema (para crear posts)
+  user             User?             @relation(fields: [userId], references: [id])
+  userId           Int?              @unique
+
+  posts            Post[]
+  voteIntentions   VoteIntention[]
+}
+
+model GovernmentPlan {
+  id               Int                @id @default(autoincrement())
+  politicalGroup   PoliticalGroup     @relation(fields: [politicalGroupId], references: [id])
+  politicalGroupId Int
+
+  title            String
+  description      String?
+  sector           String?            // acceso por sectores
+  documentUrl      String?
+  fromYear         Int?
+  toYear           Int?
+
+  items            GovernmentPlanItem[]
+}
+
+// =====================
+// POSTS, COMENTARIOS Y INTENCIÓN DE VOTO
+// =====================
 
 model Post {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  Int
-  author    User     @relation(fields: [authorId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          Int                   @id @default(autoincrement())
+  title       String
+  content     String
+  status      PostStatus            @default(PUBLISHED)
+
+  // Autor técnico (usuario con perfil de candidato)
+  author      User                  @relation(fields: [authorId], references: [id])
+  authorId    Int
+
+  // Enlazado explícito al candidato
+  candidate   Candidate?            @relation(fields: [candidateId], references: [id])
+  candidateId Int?
+
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+
+  comments           Comment[]
+  moderationAlerts   PostModerationAlert[]
 }
 
-model Vote {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  postId    Int
-  value     Int      // 1 for upvote, -1 for downvote
-  createdAt DateTime @default(now())
-  
-  @@unique([userId, postId])
+model Comment {
+  id          Int       @id @default(autoincrement())
+  post        Post      @relation(fields: [postId], references: [id])
+  postId      Int
+  author      User      @relation(fields: [authorId], references: [id])
+  authorId    Int
+
+  content     String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Comentarios anidados (opcional)
+  parent      Comment?  @relation("CommentToComment", fields: [parentId], references: [id])
+  parentId    Int?
+  replies     Comment[] @relation("CommentToComment")
+}
+
+// Intención de voto para armar rankings / simulaciones
+model VoteIntention {
+  id          Int        @id @default(autoincrement())
+  user        User       @relation(fields: [userId], references: [id])
+  userId      Int
+  candidate   Candidate  @relation(fields: [candidateId], references: [id])
+  candidateId Int
+  election    Election   @relation(fields: [electionId], references: [id])
+  electionId  Int
+
+  createdAt   DateTime   @default(now())
+
+  // Un usuario puede registrar solo una intención por candidato en una elección
+  @@unique([userId, electionId, candidateId])
+}
+
+// =====================
+// MODERACIÓN CON IA (tipo x.com)
+// =====================
+
+model PostModerationAlert {
+  id                 Int              @id @default(autoincrement())
+  post               Post             @relation(fields: [postId], references: [id])
+  postId             Int
+
+  aiSummary          String           // resumen/explicación generado por IA
+  createdAt          DateTime         @default(now())
+  status             ModerationStatus @default(PENDING)
+
+  reviewedAt         DateTime?
+  reviewedByAdmin    User?            @relation("AdminReviews", fields: [reviewedByAdminId], references: [id])
+  reviewedByAdminId  Int?
+}
+
+// =====================
+// INFORMACIÓN PARA ELECTORES Y MIEMBROS DE MESA
+// =====================
+
+model VotingCenter {
+  id          Int           @id @default(autoincrement())
+  name        String
+  address     String
+  latitude    Float?
+  longitude   Float?
+  department  String?
+  province    String?
+  district    String?
+
+  votingTables VotingTable[]
+}
+
+model VotingTable {
+  id             Int           @id @default(autoincrement())
+  code           String        @unique
+  votingCenter   VotingCenter  @relation(fields: [votingCenterId], references: [id])
+  votingCenterId Int
+
+  room           String?
+  floor          String?
+
+  voters         Voter[]
+  members        TableMember[]
+}
+
+// Contenidos informativos (instrucciones, seguridad, marco legal, tutorial, etc.)
+model GuideContent {
+  id          Int          @id @default(autoincrement())
+  title       String
+  content     String
+  category    GuideCategory
+
+  election    Election?    @relation(fields: [electionId], references: [id])
+  electionId  Int?
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+// Noticias y enlaces externos (organismos electorales, El Comercio, etc.)
+model NewsItem {
+  id              Int            @id @default(autoincrement())
+  title           String
+  summary         String?
+  content         String?
+  source          String?        // ONPE, JNE, El Comercio, etc.
+  sourceUrl       String?
+  publishedAt     DateTime?
+
+  election        Election?      @relation(fields: [electionId], references: [id])
+  electionId      Int?
+
+  politicalGroup  PoliticalGroup? @relation(fields: [politicalGroupId], references: [id])
+  politicalGroupId Int?
 }
