@@ -71,6 +71,19 @@ enum GuideCategory {
   APP_TUTORIAL                      // tutorial para usar la app
 }
 
+enum GovernmentPlanSector {
+  ECONOMY
+  HEALTH
+  EDUCATION
+  INFRASTRUCTURE
+  ENVIRONMENT
+  SOCIAL_WELFARE
+  SECURITY
+  TECHNOLOGY
+  AGRICULTURE
+  OTHER
+}
+
 // =====================
 // USUARIOS Y PERFILES
 // =====================
@@ -184,10 +197,23 @@ model GovernmentPlan {
 
   title            String
   description      String?
-  sector           String?            // acceso por sectores
   documentUrl      String?
   fromYear         Int?
   toYear           Int?
+
+  sections         GovernmentPlanSection[]
+}
+
+model GovernmentPlanSection {
+  id               Int               @id @default(autoincrement())
+  governmentPlan  GovernmentPlan    @relation(fields: [governmentPlanId], references: [id])
+  governmentPlanId Int
+  sector           GovernmentPlanSector
+
+
+  title            String
+  content          String
+  order            Int
 }
 
 // =====================

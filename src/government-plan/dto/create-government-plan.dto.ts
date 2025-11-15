@@ -1,9 +1,15 @@
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
 
 export class CreateGovernmentPlanDto {
   @ApiProperty({
-    description: 'ID de la agrupación política a la que pertenece el plan',
+    description: 'ID de la agrupación política dueña del plan de gobierno',
     example: 1,
   })
   @IsInt()
@@ -12,48 +18,41 @@ export class CreateGovernmentPlanDto {
 
   @ApiProperty({
     description: 'Título del plan de gobierno',
-    example: 'Plan de Gobierno 2026-2031 – Avanza País',
+    example: 'Plan de Gobierno 2021-2026',
   })
   @IsString()
   @IsNotEmpty()
   title: string;
 
   @ApiPropertyOptional({
-    description: 'Descripción general del plan',
+    description: 'Descripción general o resumen del plan de gobierno',
     example:
-      'Documento que detalla las principales propuestas de la agrupación para el periodo 2026-2031.',
+      'Documento que recoge las principales propuestas programáticas del partido para el periodo 2021-2026.',
   })
   @IsOptional()
   @IsString()
   description?: string;
 
   @ApiPropertyOptional({
-    description: 'Sector al que se orienta el plan (si aplica)',
-    example: 'General',
-  })
-  @IsOptional()
-  @IsString()
-  sector?: string;
-
-  @ApiPropertyOptional({
-    description: 'URL del documento PDF del plan de gobierno',
-    example: 'https://mi-dominio.com/planes/avanza-pais-2026-2031.pdf',
+    description: 'URL del documento completo del plan de gobierno (PDF, etc.)',
+    example:
+      'https://onpe.gob.pe/planes/partido-ejemplo-plan-2021-2026.pdf',
   })
   @IsOptional()
   @IsUrl()
   documentUrl?: string;
 
   @ApiPropertyOptional({
-    description: 'Año de inicio de vigencia del plan',
-    example: 2026,
+    description: 'Año de inicio de vigencia del plan de gobierno',
+    example: 2021,
   })
   @IsOptional()
   @IsInt()
   fromYear?: number;
 
   @ApiPropertyOptional({
-    description: 'Año de fin de vigencia del plan',
-    example: 2031,
+    description: 'Año de fin de vigencia del plan de gobierno',
+    example: 2026,
   })
   @IsOptional()
   @IsInt()

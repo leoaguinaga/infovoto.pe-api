@@ -20,9 +20,10 @@ import { GuideContentModule } from './guide-content/guide-content.module';
 import { NewsItemModule } from './news-item/news-item.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UploadModule } from './upload/upload.module';
+import { GovernmentPlanSectionModule } from './government-plan-section/government-plan-section.module';
 
 @Module({
-  imports: [PrismaModule, UploadModule, UserModule, VoterModule, TableMemberModule, ElectionModule, ElectoralEventModule, PoliticalGroupModule, CandidateModule, GovernmentPlanModule, PostModule, CommentModule, VoteIntentionModule, PostModerationAlertModule, VotingCenterModule, VotingTableModule, GuideContentModule, NewsItemModule],
+  imports: [PrismaModule, UploadModule, UserModule, VoterModule, TableMemberModule, ElectionModule, ElectoralEventModule, PoliticalGroupModule, CandidateModule, GovernmentPlanModule, PostModule, CommentModule, VoteIntentionModule, PostModerationAlertModule, VotingCenterModule, VotingTableModule, GuideContentModule, NewsItemModule, GovernmentPlanSectionModule],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })
