@@ -93,6 +93,94 @@ export class UserService {
     };
   }
 
+  /**
+   * Obtener perfil completo del usuario con sus relaciones
+  */
+  async getProfile(id: number): Promise<ServiceResponse<any>> {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+        voterProfile: {
+          select: {
+            documentNumber: true,
+            votingTableId: true,
+            votingTable: {
+              select: {
+                id: true,
+                code: true,
+                room: true,
+                floor: true,
+                votingCenter: {
+                  select: {
+                    id: true,
+                    name: true,
+                    address: true,
+                    latitude: true,
+                    longitude: true,
+                    department: true,
+                    province: true,
+                    district: true,
+                    sketchUrl: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        tableMemberProfile: {
+          select: {
+            roleInTable: true,
+            votingTableId: true,
+            votingTable: {
+              select: {
+                id: true,
+                code: true,
+                room: true,
+                floor: true,
+                votingCenter: {
+                  select: {
+                    id: true,
+                    name: true,
+                    address: true,
+                    latitude: true,
+                    longitude: true,
+                    department: true,
+                    province: true,
+                    district: true,
+                    sketchUrl: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Usuario no encontrado',
+        success: false,
+        data: null,
+      });
+    }
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Perfil obtenido correctamente',
+      success: true,
+      data: user,
+    };
+  }
+
   async findAll(): Promise<ServiceResponse<any[]>> {
     const users = await this.prisma.user.findMany({
       select: this.baseSelect,

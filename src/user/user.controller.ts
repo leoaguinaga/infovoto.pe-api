@@ -65,6 +65,22 @@ export class UserController {
     return this.userService.findOne(id);
   }
 
+  @Get(':id/profile')
+  @ApiOperation({ summary: 'Obtener perfil completo del usuario' })
+  @ApiResponse({
+    status: 200,
+    description: 'Perfil obtenido correctamente',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Usuario no encontrado',
+  })
+  getProfile(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ServiceResponse<any>> {
+    return this.userService.getProfile(id);
+  }
+
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar un usuario' })
   @ApiResponse({

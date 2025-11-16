@@ -114,6 +114,7 @@ export class VotingCenterService {
       department: updateVotingCenterDto.department,
       province: updateVotingCenterDto.province,
       district: updateVotingCenterDto.district,
+      sketchUrl: updateVotingCenterDto.sketchUrl,
     };
 
     // limpiar undefined

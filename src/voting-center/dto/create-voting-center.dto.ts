@@ -62,4 +62,12 @@ export class CreateVotingCenterDto {
   @IsOptional()
   @IsString()
   district?: string;
+
+  @ApiPropertyOptional({
+    description: 'URL del croquis/mapa del local de votación',
+    example: '/uploads/voting-centers/sketch-1234567890.png',
+  })
+  @IsOptional()
+  @IsString()
+  sketchUrl?: string;
 }

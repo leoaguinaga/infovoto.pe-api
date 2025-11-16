@@ -8,7 +8,10 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // Servir archivos estáticos desde la carpeta uploads
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+  // En desarrollo: dist/../uploads = uploads/
+  // En producción: dist/../uploads = uploads/
+  const uploadsPath = join(process.cwd(), 'uploads');
+  app.useStaticAssets(uploadsPath, {
     prefix: '/uploads/',
   });
 
@@ -28,6 +31,11 @@ async function bootstrap() {
       'JWT-auth', // This name will be used to reference this security scheme
     )
     .build();
+
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  });
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
 
