@@ -313,6 +313,7 @@ model VotingCenter {
   department  String?
   province    String?
   district    String?
+  sketchUrl   String?         @default("")
 
   votingTables VotingTable[]
 }
