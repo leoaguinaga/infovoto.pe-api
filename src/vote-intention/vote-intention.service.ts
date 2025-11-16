@@ -166,6 +166,53 @@ export class VoteIntentionService {
     };
   }
 
+  async findByUserAndElection(
+    userId: number,
+    electionId: number,
+  ): Promise<ServiceResponse<any[]>> {
+    // Validar usuario
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Usuario no encontrado',
+        success: false,
+        data: null,
+      });
+    }
+
+    // Validar elección
+    const election = await this.prisma.election.findUnique({
+      where: { id: electionId },
+    });
+    if (!election) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Elección no encontrada',
+        success: false,
+        data: null,
+      });
+    }
+
+    const intentions = await this.prisma.voteIntention.findMany({
+      where: {
+        userId,
+        electionId,
+      },
+      include: this.baseInclude,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Intenciones de voto obtenidas correctamente',
+      success: true,
+      data: intentions,
+    };
+  }
+
   async update(
     id: number,
     updateVoteIntentionDto: UpdateVoteIntentionDto,

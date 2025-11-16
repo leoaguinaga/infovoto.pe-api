@@ -45,7 +45,14 @@ export class PoliticalGroupService {
 
   async findAll(): Promise<ServiceResponse<any[]>> {
     const groups = await this.prisma.politicalGroup.findMany({
-      include: this.baseInclude,
+      include: {
+        ...this.baseInclude,
+        candidates: {
+          include: {
+            voteIntentions: true,
+          },
+        },
+      },
       orderBy: {
         name: 'asc',
       },
