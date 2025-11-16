@@ -25,6 +25,38 @@ export class CreateGovernmentPlanSectionDto {
   sector: GovernmentPlanSector;
 
   @ApiProperty({
+    description: 'Problema identificado que se busca abordar en esta sección',
+    example: 'Insuficiente cobertura de servicios de salud en zonas rurales',
+  })
+  @IsString()
+  @IsNotEmpty()
+  problemIdentified: string;
+
+  @ApiProperty({
+    description: 'Objetivo estratégico que se busca alcanzar con esta sección',
+    example: 'Mejorar la accesibilidad y calidad de los servicios de salud en zonas rurales',
+  })
+  @IsString()
+  @IsNotEmpty()
+  strategicObjective: string;
+
+  @ApiProperty({
+    description: 'Indicadores para medir el progreso hacia el objetivo estratégico',
+    example: 'Número de centros de salud mejorados, tasa de satisfacción de usuarios',
+  })
+  @IsString()
+  @IsNotEmpty()
+  indicators: string;
+
+  @ApiProperty({
+    description: 'Metas específicas que se buscan alcanzar en esta sección',
+    example: 'Incrementar la cobertura de salud en zonas rurales al 90% para 2026',
+  })
+  @IsString()
+  @IsNotEmpty()
+  goals: string;
+
+  @ApiProperty({
     description: 'Título descriptivo de la sección',
     example: 'Fortalecimiento del sistema de salud pública',
   })

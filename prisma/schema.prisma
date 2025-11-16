@@ -215,10 +215,13 @@ model GovernmentPlanSection {
   governmentPlanId Int
   sector           GovernmentPlanSector
 
-
-  title            String
-  content          String
-  order            Int
+  problemIdentified      String @default("")
+  strategicObjective     String @default("")
+  indicators             String @default("")
+  goals                  String @default("")
+  title                  String @default("")
+  content                String @default("") 
+  order                  Int
 }
 
 // =====================

@@ -26,6 +26,7 @@ import { Public } from '../auth/decorators/public.decorator';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Public()
   @HttpPost()
   @ApiOperation({ summary: 'Crear un nuevo usuario' })
   @ApiResponse({
