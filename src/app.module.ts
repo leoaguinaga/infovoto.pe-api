@@ -27,7 +27,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { GovernmentPlanSectionModule } from './government-plan-section/government-plan-section.module';
 
 @Module({
-  imports: [PrismaModule, UploadModule, MailModule, AuthModule, UserModule, VoterModule, TableMemberModule, ElectionModule, ElectoralEventModule, PoliticalGroupModule, CandidateModule, GovernmentPlanModule, PostModule, CommentModule, VoteIntentionModule, PostModerationAlertModule, VotingCenterModule, VotingTableModule, GuideContentModule, NewsItemModule],
+  imports: [PrismaModule, UploadModule, MailModule, AuthModule, UserModule, VoterModule, TableMemberModule, ElectionModule, ElectoralEventModule, PoliticalGroupModule, CandidateModule, GovernmentPlanModule, PostModule, CommentModule, VoteIntentionModule, PostModerationAlertModule, VotingCenterModule, VotingTableModule, GuideContentModule, NewsItemModule, GovernmentPlanSectionModule],
   controllers: [AppController],
   providers: [
     AppService,

@@ -84,6 +84,21 @@ enum GovernmentPlanSector {
   OTHER
 }
 
+enum EducationLevel {
+  BACHELOR        // Licenciatura
+  MASTER          // Maestría
+  DOCTORATE       // Doctorado
+  TECHNICAL       // Técnico
+  OTHER
+}
+
+enum InvestigationStatus {
+  IN_PROGRESS
+  ARCHIVED
+  CONVICTED
+  ACQUITTED
+}
+
 // =====================
 // USUARIOS Y PERFILES
 // =====================
@@ -184,6 +199,24 @@ model Candidate {
   biography        String?
   photoUrl         String?
 
+  // Datos personales
+  birthDate        DateTime?
+  birthPlace       String?
+  nationality      String?          @default("Peruana")
+  civilStatus      String?
+  documentType     String?
+  documentNumber   String?          @unique
+
+  // Redes sociales y contacto
+  websiteUrl       String?
+  facebookUrl      String?
+  twitterUrl       String?
+  instagramUrl     String?
+  linkedinUrl      String?
+  youtubeUrl       String?
+  contactEmail     String?
+  contactPhone     String?
+
   politicalGroup   PoliticalGroup    @relation(fields: [politicalGroupId], references: [id])
   politicalGroupId Int
 
@@ -191,8 +224,95 @@ model Candidate {
   user             User?             @relation(fields: [userId], references: [id])
   userId           Int?              @unique
 
+  // Relaciones existentes
   posts            Post[]
   voteIntentions   VoteIntention[]
+
+  // Nuevas relaciones
+  workExperience   WorkExperience[]
+  education        Education[]
+  assetDeclarations AssetDeclaration[]
+  investigations   Investigation[]
+
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model WorkExperience {
+  id              Int       @id @default(autoincrement())
+  candidate       Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  candidateId     Int
+
+  position        String    // cargo (ej: "GERENTE GENERAL")
+  company         String    // institución/empresa
+  startYear       Int
+  endYear         Int?      // null si es "Presente"
+  isCurrent       Boolean   @default(false)
+  description     String?   // descripción de responsabilidades
+
+  order           Int       // para ordenar cronológicamente
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Education {
+  id              Int            @id @default(autoincrement())
+  candidate       Candidate      @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  candidateId     Int
+
+  level           EducationLevel
+  degree          String         // título obtenido
+  institution     String         // universidad/institución
+  graduationYear  Int
+  fieldOfStudy    String?        // campo de estudio
+
+  order           Int            // para ordenar cronológicamente
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model AssetDeclaration {
+  id              Int       @id @default(autoincrement())
+  candidate       Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  candidateId     Int
+
+  year            Int
+  declaredIncome  Decimal   @db.Decimal(15, 2) // ingresos anuales declarados
+  currency        String    @default("PEN") // S/, USD, etc.
+  source          String?   // fuente (ej: "JNE")
+  description     String?   // incluye remuneraciones, rentas, dividendos
+
+  // Desglose opcional
+  salaryIncome    Decimal?  @db.Decimal(15, 2)
+  rentalIncome    Decimal?  @db.Decimal(15, 2)
+  dividendIncome  Decimal?  @db.Decimal(15, 2)
+  otherIncome     Decimal?  @db.Decimal(15, 2)
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([candidateId, year])
+}
+
+model Investigation {
+  id              Int                  @id @default(autoincrement())
+  candidate       Candidate            @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  candidateId     Int
+
+  type            String               // "Presunta colusión", etc.
+  description     String
+  institution     String               // "Jurado Nacional de Elecciones (JNE)"
+  status          InvestigationStatus
+  filingDate      DateTime?
+  resolutionDate  DateTime?
+  outcome         String?              // resultado del proceso
+
+  sourceUrl       String?              // link a fuente oficial
+
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
 }
 
 model GovernmentPlan {

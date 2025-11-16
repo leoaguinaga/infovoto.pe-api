@@ -31,9 +31,26 @@ export class CandidateService {
         role: true,
       },
     },
-    // opcional, puedes quitar si no quieres cargar tanto
-    posts: true,
-    voteIntentions: true,
+    workExperience: {
+      orderBy: {
+        order: 'asc' as const,
+      },
+    },
+    education: {
+      orderBy: {
+        order: 'asc' as const,
+      },
+    },
+    assetDeclarations: {
+      orderBy: {
+        year: 'desc' as const,
+      },
+    },
+    investigations: {
+      orderBy: {
+        createdAt: 'desc' as const,
+      },
+    },
   };
 
   async create(
@@ -130,7 +147,21 @@ export class CandidateService {
   async findOne(id: number): Promise<ServiceResponse<any>> {
     const candidate = await this.prisma.candidate.findUnique({
       where: { id },
-      include: this.baseInclude,
+      include: {
+        ...this.baseInclude,
+        politicalGroup: {
+          include: {
+            governmentPlans: {
+              include: {
+                sections: true,
+              }
+            },
+          }
+        },
+        posts: {
+          orderBy: { createdAt: 'desc' as const }
+        }
+      },
     });
 
     if (!candidate) {
@@ -273,6 +304,380 @@ export class CandidateService {
     return {
       statusCode: HttpStatus.OK,
       message: 'Candidato eliminado correctamente',
+      success: true,
+      data: existing,
+    };
+  }
+
+  // =====================
+  // WORK EXPERIENCE
+  // =====================
+
+  async addWorkExperience(candidateId: number, data: any): Promise<ServiceResponse<any>> {
+    const candidate = await this.prisma.candidate.findUnique({
+      where: { id: candidateId },
+    });
+
+    if (!candidate) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Candidato no encontrado',
+        success: false,
+        data: null,
+      });
+    }
+
+    const workExperience = await this.prisma.workExperience.create({
+      data: {
+        candidateId,
+        position: data.position,
+        company: data.company,
+        startYear: data.startYear,
+        endYear: data.endYear,
+        isCurrent: data.isCurrent,
+        description: data.description,
+        order: data.order,
+      },
+    });
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Experiencia laboral agregada correctamente',
+      success: true,
+      data: workExperience,
+    };
+  }
+
+  async updateWorkExperience(id: number, data: any): Promise<ServiceResponse<any>> {
+    const existing = await this.prisma.workExperience.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Experiencia laboral no encontrada',
+        success: false,
+        data: null,
+      });
+    }
+
+    const workExperience = await this.prisma.workExperience.update({
+      where: { id },
+      data,
+    });
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Experiencia laboral actualizada correctamente',
+      success: true,
+      data: workExperience,
+    };
+  }
+
+  async deleteWorkExperience(id: number): Promise<ServiceResponse<any>> {
+    const existing = await this.prisma.workExperience.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Experiencia laboral no encontrada',
+        success: false,
+        data: null,
+      });
+    }
+
+    await this.prisma.workExperience.delete({
+      where: { id },
+    });
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Experiencia laboral eliminada correctamente',
+      success: true,
+      data: existing,
+    };
+  }
+
+  // =====================
+  // EDUCATION
+  // =====================
+
+  async addEducation(candidateId: number, data: any): Promise<ServiceResponse<any>> {
+    const candidate = await this.prisma.candidate.findUnique({
+      where: { id: candidateId },
+    });
+
+    if (!candidate) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Candidato no encontrado',
+        success: false,
+        data: null,
+      });
+    }
+
+    const education = await this.prisma.education.create({
+      data: {
+        candidateId,
+        level: data.level,
+        degree: data.degree,
+        institution: data.institution,
+        graduationYear: data.graduationYear,
+        fieldOfStudy: data.fieldOfStudy,
+        order: data.order,
+      },
+    });
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Formación académica agregada correctamente',
+      success: true,
+      data: education,
+    };
+  }
+
+  async updateEducation(id: number, data: any): Promise<ServiceResponse<any>> {
+    const existing = await this.prisma.education.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Formación académica no encontrada',
+        success: false,
+        data: null,
+      });
+    }
+
+    const education = await this.prisma.education.update({
+      where: { id },
+      data,
+    });
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Formación académica actualizada correctamente',
+      success: true,
+      data: education,
+    };
+  }
+
+  async deleteEducation(id: number): Promise<ServiceResponse<any>> {
+    const existing = await this.prisma.education.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Formación académica no encontrada',
+        success: false,
+        data: null,
+      });
+    }
+
+    await this.prisma.education.delete({
+      where: { id },
+    });
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Formación académica eliminada correctamente',
+      success: true,
+      data: existing,
+    };
+  }
+
+  // =====================
+  // ASSET DECLARATIONS
+  // =====================
+
+  async addAssetDeclaration(candidateId: number, data: any): Promise<ServiceResponse<any>> {
+    const candidate = await this.prisma.candidate.findUnique({
+      where: { id: candidateId },
+    });
+
+    if (!candidate) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Candidato no encontrado',
+        success: false,
+        data: null,
+      });
+    }
+
+    const assetDeclaration = await this.prisma.assetDeclaration.create({
+      data: {
+        candidateId,
+        year: data.year,
+        declaredIncome: data.declaredIncome,
+        currency: data.currency || 'PEN',
+        source: data.source,
+        description: data.description,
+        salaryIncome: data.salaryIncome,
+        rentalIncome: data.rentalIncome,
+        dividendIncome: data.dividendIncome,
+        otherIncome: data.otherIncome,
+      },
+    });
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Declaración patrimonial agregada correctamente',
+      success: true,
+      data: assetDeclaration,
+    };
+  }
+
+  async updateAssetDeclaration(id: number, data: any): Promise<ServiceResponse<any>> {
+    const existing = await this.prisma.assetDeclaration.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Declaración patrimonial no encontrada',
+        success: false,
+        data: null,
+      });
+    }
+
+    const assetDeclaration = await this.prisma.assetDeclaration.update({
+      where: { id },
+      data,
+    });
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Declaración patrimonial actualizada correctamente',
+      success: true,
+      data: assetDeclaration,
+    };
+  }
+
+  async deleteAssetDeclaration(id: number): Promise<ServiceResponse<any>> {
+    const existing = await this.prisma.assetDeclaration.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Declaración patrimonial no encontrada',
+        success: false,
+        data: null,
+      });
+    }
+
+    await this.prisma.assetDeclaration.delete({
+      where: { id },
+    });
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Declaración patrimonial eliminada correctamente',
+      success: true,
+      data: existing,
+    };
+  }
+
+  // =====================
+  // INVESTIGATIONS
+  // =====================
+
+  async addInvestigation(candidateId: number, data: any): Promise<ServiceResponse<any>> {
+    const candidate = await this.prisma.candidate.findUnique({
+      where: { id: candidateId },
+    });
+
+    if (!candidate) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Candidato no encontrado',
+        success: false,
+        data: null,
+      });
+    }
+
+    const investigation = await this.prisma.investigation.create({
+      data: {
+        candidateId,
+        type: data.type,
+        description: data.description,
+        institution: data.institution,
+        status: data.status,
+        filingDate: data.filingDate ? new Date(data.filingDate) : null,
+        resolutionDate: data.resolutionDate ? new Date(data.resolutionDate) : null,
+        outcome: data.outcome,
+        sourceUrl: data.sourceUrl,
+      },
+    });
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Investigación agregada correctamente',
+      success: true,
+      data: investigation,
+    };
+  }
+
+  async updateInvestigation(id: number, data: any): Promise<ServiceResponse<any>> {
+    const existing = await this.prisma.investigation.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Investigación no encontrada',
+        success: false,
+        data: null,
+      });
+    }
+
+    const updateData: any = { ...data };
+    if (data.filingDate) updateData.filingDate = new Date(data.filingDate);
+    if (data.resolutionDate) updateData.resolutionDate = new Date(data.resolutionDate);
+
+    const investigation = await this.prisma.investigation.update({
+      where: { id },
+      data: updateData,
+    });
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Investigación actualizada correctamente',
+      success: true,
+      data: investigation,
+    };
+  }
+
+  async deleteInvestigation(id: number): Promise<ServiceResponse<any>> {
+    const existing = await this.prisma.investigation.findUnique({
+      where: { id },
+    });
+
+    if (!existing) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Investigación no encontrada',
+        success: false,
+        data: null,
+      });
+    }
+
+    await this.prisma.investigation.delete({
+      where: { id },
+    });
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Investigación eliminada correctamente',
       success: true,
       data: existing,
     };
