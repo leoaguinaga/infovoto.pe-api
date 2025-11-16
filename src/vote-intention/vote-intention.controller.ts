@@ -73,6 +73,26 @@ export class VoteIntentionController {
     return this.voteIntentionService.findOne(id);
   }
 
+  @Get('user/:userId/election/:electionId')
+  @ApiOperation({ 
+    summary: 'Obtener intenciones de voto de un usuario en una elección específica',
+    description: 'Retorna todas las intenciones de voto registradas por un usuario para una elección determinada'
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Intenciones de voto obtenidas correctamente',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Usuario o elección no encontrados',
+  })
+  findByUserAndElection(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Param('electionId', ParseIntPipe) electionId: number,
+  ): Promise<ServiceResponse<any[]>> {
+    return this.voteIntentionService.findByUserAndElection(userId, electionId);
+  }
+
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar una intención de voto' })
   @ApiResponse({
